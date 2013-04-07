@@ -70,68 +70,68 @@ namespace itk
 	{
 	public:
 		/** Standard class typedefs. */
-		typedef OrientedFluxMatrixImageFilter															Self;
-		typedef ImageToImageFilter<TInputImage,TOutputImage>							Superclass;
-		typedef SmartPointer<Self>																				Pointer;
-		typedef SmartPointer<const Self>																	ConstPointer;
+		typedef OrientedFluxMatrixImageFilter                               Self;
+		typedef ImageToImageFilter<TInputImage,TOutputImage>				Superclass;
+		typedef SmartPointer<Self>											Pointer;
+		typedef SmartPointer<const Self>									ConstPointer;
 		
 		/** Pixel Type of the input image */
-		typedef TInputImage																								InputImageType;
-		typedef typename InputImageType::Pointer													InputImagePointer;
-		typedef typename InputImageType::ConstPointer											InputImageConstPointer;
-		typedef typename InputImageType::PixelType												PixelType;
-		typedef typename NumericTraits<PixelType>::RealType								RealType;
-		typedef typename InputImageType::SizeType													InputSizeType;
-		typedef typename InputImageType::RegionType												InputRegionType;
-		typedef typename InputImageType::SpacingType											SpacingType;
-		typedef typename InputImageType::IndexType												IndexType;
-		typedef typename InputImageType::RegionType												RegionType;
-		typedef typename InputImageType::SizeType													SizeType;
-		typedef typename InputImageType::PointType												PointType;
+		typedef TInputImage													InputImageType;
+		typedef typename InputImageType::Pointer							InputImagePointer;
+		typedef typename InputImageType::ConstPointer						InputImageConstPointer;
+		typedef typename InputImageType::PixelType							PixelType;
+		typedef typename NumericTraits<PixelType>::RealType					RealType;
+		typedef typename InputImageType::SizeType							InputSizeType;
+		typedef typename InputImageType::RegionType							InputRegionType;
+		typedef typename InputImageType::SpacingType						SpacingType;
+		typedef typename InputImageType::IndexType							IndexType;
+		typedef typename InputImageType::RegionType							RegionType;
+		typedef typename InputImageType::SizeType							SizeType;
+		typedef typename InputImageType::PointType							PointType;
 		
 		/** External gradient  */
-		typedef TGradientImage																						GradientImageType;
-		typedef typename GradientImageType::Pointer												GradientImagePointer;
+		typedef TGradientImage												GradientImageType;
+		typedef typename GradientImageType::Pointer							GradientImagePointer;
 
 		/** Internal types used by the FFT filters. */
-		typedef typename GradientImageType::PixelType::ValueType					InternalPrecision;
-		typedef Image< InternalPrecision, TInputImage::ImageDimension >   InternalImageType;
-		typedef typename InternalImageType::Pointer                       InternalImagePointerType;
-		typedef std::complex< InternalPrecision >                         InternalComplexType;
-		typedef Image< InternalComplexType, TInputImage::ImageDimension > InternalComplexImageType;
-		typedef typename InternalComplexImageType::Pointer                InternalComplexImagePointerType;
+		typedef typename GradientImageType::PixelType::ValueType			InternalPrecision;
+		typedef Image< InternalPrecision, TInputImage::ImageDimension >     InternalImageType;
+		typedef typename InternalImageType::Pointer                       	InternalImagePointerType;
+		typedef std::complex< InternalPrecision >                           InternalComplexType;
+		typedef Image< InternalComplexType, TInputImage::ImageDimension >   InternalComplexImageType;
+		typedef typename InternalComplexImageType::Pointer                  InternalComplexImagePointerType;
 		
 		typedef VectorIndexSelectionCastImageFilter
-		<GradientImageType, InternalImageType >														GradientIndexSelectorFilterType;
-		typedef typename GradientIndexSelectorFilterType::Pointer					GradientIndexSelectorPointer;
+		<GradientImageType, InternalImageType >								GradientIndexSelectorFilterType;
+		typedef typename GradientIndexSelectorFilterType::Pointer			GradientIndexSelectorPointer;
 		
 		
 		/** Typedef to describe the boundary condition. */
-		typedef ImageBoundaryCondition< InternalImageType >								BoundaryConditionType;
-		typedef BoundaryConditionType *																		BoundaryConditionPointerType;
-		typedef ZeroFluxNeumannBoundaryCondition< InternalImageType >			DefaultBoundaryConditionType;
+		typedef ImageBoundaryCondition< InternalImageType >					BoundaryConditionType;
+		typedef BoundaryConditionType *										BoundaryConditionPointerType;
+		typedef ZeroFluxNeumannBoundaryCondition< InternalImageType >		DefaultBoundaryConditionType;
 		
 		/** FFT filters */
 		typedef RealToHalfHermitianForwardFFTImageFilter
-		< InternalImageType, InternalComplexImageType >										FFTFilterType;
+		< InternalImageType, InternalComplexImageType >						FFTFilterType;
 		
 		typedef HalfHermitianToRealInverseFFTImageFilter
-		< InternalComplexImageType,	InternalImageType >										IFFTFilterType;
+		< InternalComplexImageType,	InternalImageType >						IFFTFilterType;
 		
 		/** Type of the output Image */
-		typedef TOutputImage																							OutputImageType;
-		typedef typename OutputImageType::Pointer													OutputImagePointer;
-		typedef typename OutputImageType::PixelType												OutputPixelType;
-		typedef typename PixelTraits<OutputPixelType>::ValueType					OutputComponentType;
+		typedef TOutputImage												OutputImageType;
+		typedef typename OutputImageType::Pointer							OutputImagePointer;
+		typedef typename OutputImageType::PixelType							OutputPixelType;
+		typedef typename PixelTraits<OutputPixelType>::ValueType			OutputComponentType;
 		
 		/** Image adaptor */
 		typedef NthElementImageAdaptor
-		<OutputImageType, OutputComponentType>														OutputImageAdaptorType;
-		typedef typename OutputImageAdaptorType::Pointer									OutputImageAdaptorPointer;
+		<OutputImageType, OutputComponentType>								OutputImageAdaptorType;
+		typedef typename OutputImageAdaptorType::Pointer					OutputImageAdaptorPointer;
 		
 		/**declare types for regions */
-		typedef typename InputImageType::RegionType												InputImageRegionType;
-    typedef typename OutputImageType::RegionType											OutputImageRegionType;
+		typedef typename InputImageType::RegionType							InputImageRegionType;
+    typedef typename OutputImageType::RegionType							OutputImageRegionType;
 		
 		/** Set/get the boundary condition. */
 		itkSetMacro(BoundaryCondition, BoundaryConditionPointerType);
@@ -226,13 +226,11 @@ namespace itk
 		RealType											m_Sigma0;
 		RealType											m_Radius;
 		
-		DefaultBoundaryConditionType	m_DefaultBoundaryCondition;
-		BoundaryConditionPointerType	m_BoundaryCondition;
+		DefaultBoundaryConditionType                        m_DefaultBoundaryCondition;
+		BoundaryConditionPointerType                        m_BoundaryCondition;
 		
-		OutputImageAdaptorPointer			m_ImageAdaptor;
+		OutputImageAdaptorPointer                           m_ImageAdaptor;
 		
-		bool													m_UseExternalGradient;
-		GradientImagePointer					m_ExternalImageGradient;
 	};
 	
 } // end namespace itk

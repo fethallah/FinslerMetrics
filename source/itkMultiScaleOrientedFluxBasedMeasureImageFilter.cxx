@@ -254,7 +254,6 @@ int Execute(int argc, char* argv[])
 	// Parse the input arguments.
 	unsigned int argumentOffset = 1;
 	std::string inputImageFilePath = argv[argumentOffset++];
-	bool isGradientPrecomputed = (bool)atoi(argv[argumentOffset++]);
 	std::string gradientImageFilePath = argv[argumentOffset++];
 	std::string outputTubularityScoreImageFilePath = argv[argumentOffset++];
 	bool generateScaleSpaceTubularityScoreImage = (bool)atoi(argv[argumentOffset++]);
@@ -292,23 +291,6 @@ int Execute(int argc, char* argv[])
 	typename InputImageType::Pointer inputImage = imageReader->GetOutput();
 	inputImage->DisconnectPipeline();
 	
-	typename GradientImageType::Pointer gradientImage = NULL;
-	if(isGradientPrecomputed)
-	{
-		std::cout << "precomputed gradient " << std::endl;
-		typename GradientReaderType::Pointer gradientReader = GradientReaderType::New();
-		gradientReader->SetFileName(gradientImageFilePath);
-		try {
-			gradientReader->Update();
-		}
-		catch (itk::ExceptionObject &ex) {
-			std::cout << ex << std::endl;
-			std::cout << "cannot read gradient image" << std::endl;
-			return EXIT_FAILURE;
-		}
-		gradientImage = gradientReader->GetOutput();
-		gradientImage->DisconnectPipeline();
-	}
 	
 	
 	typename OrientedFluxCrossSectionTraceMultiScaleEnhancementFilterType::Pointer orientedFluxCrossSectionTraceMultiScaleEnhancementFilter = 
@@ -320,9 +302,7 @@ int Execute(int argc, char* argv[])
 	
 	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetInput(inputImage);
 	
-	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetUseExternalGradient( isGradientPrecomputed );
-	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetExternalImageGradient( gradientImage );
-	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetSigmaMinimum( sigmaMin ); 
+	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetSigmaMinimum( sigmaMin );
 	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetSigmaMaximum( sigmaMax );  
 	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetNumberOfSigmaSteps( numberOfScales );
 	orientedFluxCrossSectionTraceMultiScaleEnhancementFilter->SetFixedSigmaForHessianImage( fixedSigmaForHessianComputation );

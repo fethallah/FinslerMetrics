@@ -70,10 +70,7 @@ namespace itk
 		m_GenerateHessianOutput = false;
 		m_GenerateNPlus1DHessianOutput = false;
 		m_GenerateNPlus1DHessianMeasureOutput = false;
-		
-		m_UseExternalGradient = false;
-		m_ExternalImageGradient = NULL;
-		
+				
 		this->ProcessObject::SetNumberOfRequiredOutputs(5);
 		this->ProcessObject::SetNthOutput(1,this->MakeOutput(1));
 		this->ProcessObject::SetNthOutput(2,this->MakeOutput(2));
@@ -116,84 +113,6 @@ namespace itk
 			itkExceptionMacro(<<"number of scales must be positive"); 
 		}
 	}
-	
-	/**
-	 * Set Use External Gradient
-	 */
-	template 	<typename TInputImage,
-	typename TGradientImage,
-	typename THessianImage,
-	typename TScaleImage,
-	typename THessianToMeasureFilter,
-	typename TOutputNDImage>
-	void
-	MultiScaleOrientedFluxBasedMeasureImageFilter
-	<TInputImage,TGradientImage,THessianImage,TScaleImage,THessianToMeasureFilter,TOutputNDImage>
-	::SetUseExternalGradient( bool useExternalGradient )
-	{
-		if(m_UseExternalGradient != useExternalGradient)
-		{
-			m_UseExternalGradient = useExternalGradient;
-			this->Modified();
-		}
-	}
-	
-	/**
-	 * Get Use External Image Gradient
-	 */
-	template 	<typename TInputImage,
-	typename TGradientImage,
-	typename THessianImage,
-	typename TScaleImage,
-	typename THessianToMeasureFilter,
-	typename TOutputNDImage>	
-	bool
-	MultiScaleOrientedFluxBasedMeasureImageFilter
-	<TInputImage,TGradientImage,THessianImage,TScaleImage,THessianToMeasureFilter,TOutputNDImage>
-	::GetUseExternalGradient( )
-	{
-		return	m_UseExternalGradient;
-	}
-	
-	/**
-	 * Set External Image Gradient
-	 */
-	template 	<typename TInputImage,
-	typename TGradientImage,
-	typename THessianImage,
-	typename TScaleImage,
-	typename THessianToMeasureFilter,
-	typename TOutputNDImage>
-	void
-	MultiScaleOrientedFluxBasedMeasureImageFilter
-	<TInputImage,TGradientImage,THessianImage,TScaleImage,THessianToMeasureFilter,TOutputNDImage>
-	::SetExternalImageGradient( GradientImagePointer externalImageGradient )
-	{
-		if( m_ExternalImageGradient != externalImageGradient )
-		{
-			m_ExternalImageGradient = externalImageGradient;
-			this->Modified();
-		}
-	}
-	
-	/**
-	 * Get External Image Gradient
-	 */
-	template 	<typename TInputImage,
-	typename TGradientImage,
-	typename THessianImage,
-	typename TScaleImage,
-	typename THessianToMeasureFilter,
-	typename TOutputNDImage>
-	typename MultiScaleOrientedFluxBasedMeasureImageFilter
-	<TInputImage,TGradientImage,THessianImage,TScaleImage,THessianToMeasureFilter,TOutputNDImage>::GradientImagePointer
-	MultiScaleOrientedFluxBasedMeasureImageFilter
-	<TInputImage,TGradientImage,THessianImage,TScaleImage,THessianToMeasureFilter,TOutputNDImage>
-	::GetExternalImageGradient( )
-	{
-		return	m_ExternalImageGradient;
-	}
-	
 	
 	/**
 	 * EnlargeOutputRequestedRegion
@@ -526,11 +445,6 @@ namespace itk
 			conv->SetInput( input );
 			conv->SetSigma0( m_FixedSigmaForHessianImage );
 			conv->SetNumberOfThreads( this->GetNumberOfThreads() );
-			conv->SetUseExternalGradient( this->GetUseExternalGradient() );
-			if(this->GetUseExternalGradient())
-			{
-				conv->SetExternalImageGradient( m_ExternalImageGradient.GetPointer() );
-			}
 			conv->SetRadius( m_Sigmas[i] );
 			itk::TimeProbe time;
 			time.Start();
@@ -797,8 +711,6 @@ namespace itk
 		os << indent << "GenerateHessianOutput: " << m_GenerateHessianOutput << std::endl;
 		os << indent << "GenerateNPlus1DHessianMeasureOutput: " << m_GenerateNPlus1DHessianMeasureOutput << std::endl;
 		os << indent << "GenerateNPlus1DHessianOutput: " << m_GenerateNPlus1DHessianOutput << std::endl;
-		os << indent << "UseExternalGradient: " << m_UseExternalGradient << std::endl;
-		os << indent << "ExternalImageGradient: " << m_ExternalImageGradient << std::endl;
 	}
 	
 	

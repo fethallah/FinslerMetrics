@@ -205,15 +205,7 @@ namespace itk
 		itkSetMacro(BrightObject,bool);
 		itkGetConstMacro(BrightObject,bool);
 		itkBooleanMacro(BrightObject);
-		
-		/** Set/Get for using external image gradient */
-		void SetUseExternalGradient(bool useExternalGradient);
-		bool GetUseExternalGradient();
-		
-		/** Set/Getexternal image gradient */
-		void SetExternalImageGradient(GradientImagePointer imageGradient);
-		GradientImagePointer GetExternalImageGradient();
-		
+				
 		/** Methods to turn on/off flag to generate an image with hessian-based objectness 
 		 * measure values at each pixel. */
 		itkSetMacro(GenerateNPlus1DHessianMeasureOutput,bool);
@@ -265,8 +257,6 @@ namespace itk
 		
 		bool																							m_BrightObject;
 		
-		bool																							m_UseExternalGradient;
-		GradientImagePointer															m_ExternalImageGradient;
 	};
 	
 } // end namespace itk

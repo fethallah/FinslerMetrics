@@ -4,14 +4,14 @@
 
 
 # Configuration directories and files
-SourceDirectory: /users/feth/Documents/Work/Writing/UnderProgress/ITK-TubularGeodesics/src
-BuildDirectory: /users/feth/Documents/Work/Writing/UnderProgress/ITK-TubularGeodesics/src
+SourceDirectory: /Users/feth/Documents/Work/Source/ANR2013/FinslerMetrics/source
+BuildDirectory: /Users/feth/Documents/Work/Source/ANR2013/FinslerMetrics/source
 
 # Where to place the cost data store
 CostDataFile: 
 
 # Site is something like machine.domain, i.e. pragmatic.crd
-Site: icdhcp-1-031.epfl.ch
+Site: Fethallahs-MacBook-Pro.local
 
 # Build name is osname-revision-compiler, i.e. Linux-2.4.2-2smp-c++
 BuildName: Darwin-c++
@@ -33,8 +33,8 @@ ScpCommand: /usr/bin/scp
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/opt/local/bin/cmake" "/users/feth/Documents/Work/Writing/UnderProgress/ITK-TubularGeodesics/src"
-MakeCommand: /usr/bin/make -i
+ConfigureCommand: "/Applications/CMake 2.8-10.app/Contents/bin/cmake" "/Users/feth/Documents/Work/Source/ANR2013/FinslerMetrics/source"
+MakeCommand: /Applications/CMake\ 2.8-10.app/Contents/bin/cmakexbuild -project FinslerianMetrics.xcodeproj build -target ALL_BUILD -configuration ${CTEST_CONFIGURATION_TYPE}
 DefaultCTestConfigurationType: Release
 
 # CVS options
@@ -44,10 +44,11 @@ CVSUpdateOptions: -d -A -P
 
 # Subversion options
 SVNCommand: /usr/bin/svn
+SVNOptions: 
 SVNUpdateOptions: 
 
 # Git options
-GITCommand: /usr/local/git/bin/git
+GITCommand: /usr/bin/git
 GITUpdateOptions: 
 GITUpdateCustom: 
 
@@ -82,7 +83,7 @@ SlurmRunCommand: SLURM_SRUN_COMMAND-NOTFOUND
 # Currently set to 25 minutes
 TimeOut: 1500
 
-UseLaunchers: 
+UseLaunchers: 0
 CurlOptions: 
 # warning, if you add new options here that have to do with submit,
 # you have to update cmCTestSubmitCommand.cxx

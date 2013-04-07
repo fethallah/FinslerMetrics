@@ -59,12 +59,12 @@ namespace itk
 	template <typename TInputImage, 
 	typename TOutputImage= Image< SymmetricSecondRankTensor< 
   typename NumericTraits< typename TInputImage::PixelType>::RealType,
-  ::itk::GetImageDimension<TInputImage>::ImageDimension >,
-	::itk::GetImageDimension<TInputImage>::ImageDimension >, 
+    TInputImage::ImageDimension >,
+    TInputImage::ImageDimension >, 
   typename TGradientImage = Image< CovariantVector<
 	float,
-	::itk::GetImageDimension<TInputImage>::ImageDimension >, 
-	::itk::GetImageDimension<TInputImage>::ImageDimension >	>
+    TInputImage::ImageDimension >,
+	TInputImage::ImageDimension >	>
 	class ITK_EXPORT OrientedFluxMatrixImageFilter:
 	public ImageToImageFilter<TInputImage,TOutputImage>
 	{
@@ -138,8 +138,7 @@ namespace itk
 		itkGetConstMacro(BoundaryCondition, BoundaryConditionPointerType);
 
 		/** Image dimension. */
-		itkStaticConstMacro(ImageDimension, unsigned int,
-												::itk::GetImageDimension<TInputImage>::ImageDimension);
+		itkStaticConstMacro(ImageDimension, unsigned int, TInputImage::ImageDimension);
 		
 		/** Run-time type information (and related methods).   */
 		itkTypeMacro( OrientedFluxMatrixImageFilter, ImageToImageFilter );

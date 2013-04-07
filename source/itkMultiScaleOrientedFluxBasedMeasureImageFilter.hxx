@@ -32,7 +32,7 @@
 #include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
 #include "vnl/vnl_math.h"
-#include <omp.h>
+
 
 namespace itk
 {

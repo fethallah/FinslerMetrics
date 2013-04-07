@@ -69,7 +69,7 @@ namespace itk
 	typename TScaleImage,
 	typename TOrientedFluxToMeasureFilter,
 	typename TOutputNDImage = Image<typename NumericTraits<typename TInputImage::PixelType>::ScalarRealType, 
-	::itk::GetImageDimension<TInputImage>::ImageDimension> >
+    TInputImage::ImageDimension> >
 	class ITK_EXPORT MultiScaleOrientedFluxBasedMeasureImageFilter 
 	: public ImageToImageFilter< TInputImage, TOutputNDImage > 
 	{
@@ -94,9 +94,9 @@ namespace itk
 		
 		/** Declare outputs types */
 		typedef	Image<typename OutputNDImageType::PixelType, 
-		::itk::GetImageDimension<OutputNDImageType>::ImageDimension + 1>					OutputNPlus1DImageType;
+		OutputNDImageType::ImageDimension + 1>					OutputNPlus1DImageType;
 		typedef Image<typename HessianImageType::PixelType, 
-		::itk::GetImageDimension<HessianImageType>::ImageDimension + 1>						NPlus1DHessianImageType;
+		HessianImageType::ImageDimension + 1>						NPlus1DHessianImageType;
 		
 		typedef typename TInputImage::PixelType																		InputPixelType;
 		typedef typename TInputImage::RegionType																	InputRegionType;
@@ -108,8 +108,7 @@ namespace itk
 		InputImageType::ImageDimension>																						InputToOutputRegionCopierType;
 		
 		/** Image dimension. */
-		itkStaticConstMacro(ImageDimension, unsigned int, 
-												::itk::GetImageDimension<InputImageType>::ImageDimension);
+		itkStaticConstMacro(ImageDimension, unsigned int, InputImageType::ImageDimension);
 		
 		/** Types for Scale image */
 		typedef typename ScaleImageType::PixelType																ScalePixelType;

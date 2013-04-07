@@ -21,7 +21,9 @@
 #include "itkOrientedFluxMatrixImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkExtractImageFilter.h"
+#include "itkGeometryUtilities.h"
 #include "vnl/vnl_bessel.h"
+#include "boost/math/tr1.hpp"
 
 namespace itk
 {
@@ -32,11 +34,11 @@ namespace itk
 	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
 	::OrientedFluxMatrixImageFilter()
 	{
-		m_Sigma0								= 1.0;
-		m_Radius								= 1.0;
-		m_BoundaryCondition			= &m_DefaultBoundaryCondition;
-		m_ImageAdaptor					= OutputImageAdaptorType::New();
-		m_UseExternalGradient		= false;
+		m_Sigma0				= 1.0;
+		m_Radius				= 1.0;
+		m_BoundaryCondition		= &m_DefaultBoundaryCondition;
+		m_ImageAdaptor			= OutputImageAdaptorType::New();
+		m_UseExternalGradient	= false;
 		m_ExternalImageGradient = NULL;
 	}
 	
@@ -244,6 +246,19 @@ namespace itk
 		double eps = itk::NumericTraits<float>::epsilon();	
 		double Ui = 0.0, Uj = 0.0;
 		double normU;
+        
+        double multiplicativeFactor = 0;
+        unsigned int p;
+        if(ImageDimension%2 == 0)
+        {
+            p = ImageDimension / 2;
+            multiplicativeFactor = radius * vcl_pow(2.0, double(p-1)) * GeometryUtilities::Factorial(p-1);
+        }
+        else
+        {
+            p = floor(ImageDimension / 2);
+            multiplicativeFactor = radius * GeometryUtilities::Factorial(2*p) / (GeometryUtilities::Factorial(p)*vcl_pow(2.0, double(p))) ;
+        }
 		
 		typedef itk::ImageRegionIterator< InternalComplexImageType > ImageIterator;
 		ImageIterator  it( kernel, kernel->GetLargestPossibleRegion() );
@@ -276,27 +291,24 @@ namespace itk
 				if( !m_UseExternalGradient )
 				{
 					// second order derivatives.
-					derivativesTerm = InternalComplexType(-exp( -2.0* piNormUSigma * piNormUSigma )* Ui * Uj, 0.0);
+					derivativesTerm = InternalComplexType(- (2.0*vnl_math::pi*Ui) * (2.0*vnl_math::pi*Uj)
+                                                          * exp( -2.0* piNormUSigma * piNormUSigma ), 0.0);
 				}
 				else
 				{
 					// first order derivatives.
-					derivativesTerm = InternalComplexType(0.0, exp( -2.0* piNormUSigma * piNormUSigma )* Uj);
+					derivativesTerm = InternalComplexType(0.0, ( 2.0*vnl_math::pi*Uj )
+                                                          * exp( -2.0* piNormUSigma * piNormUSigma ) );
 				}
 
 				InternalComplexType kernelTerm(0.0, 0.0);
 				if(ImageDimension%2 == 0)
 				{// scale normalized response
-					unsigned int p = ImageDimension / 2; 
-					kernelTerm  = InternalComplexType(vnl_bessel(p, phase) / (vcl_pow(double(normU), double(p)) * vcl_pow(double(radius), double(p-1))), 0.0);
-				}
-				else if(ImageDimension == 3)
-				{// scale normalized response
-					kernelTerm  = InternalComplexType(( sin(phase)/phase - cos(phase) ) / (radius * normU*normU), 0.0);
+					kernelTerm  = InternalComplexType( multiplicativeFactor * vnl_bessel(p, phase) / vcl_pow(phase, double(p)), 0.0);
 				}
 				else
-				{
-					itkGenericExceptionMacro("Oriented Flux filter in the Fourier imlemented only for dimensions 2 and 3 and 4, and all even dimensions");
+				{// scale normalized response
+					kernelTerm  = InternalComplexType( multiplicativeFactor * boost::math::tr1::sph_bessel(p, phase) / vcl_pow(phase, double(p)), 0.0);
 				}
 				value = kernelTerm * derivativesTerm;
 			}

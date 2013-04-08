@@ -30,8 +30,8 @@ namespace itk
 	/**
 	 * Constructor
 	 */
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::OrientedFluxMatrixImageFilter()
 	{
 		m_Sigma0				= 1.0;
@@ -43,9 +43,9 @@ namespace itk
 	/**
 	 * Set Sigma0
 	 */
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::SetSigma0( RealType sigma0 )
 	{
 		if(m_Sigma0 != sigma0)
@@ -58,9 +58,9 @@ namespace itk
 	/**
 	 * Get Sigma0
 	 */
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
-	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >::RealType
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
+	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >::RealType
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::GetSigma0( )
 	{
 		return	m_Sigma0;
@@ -69,9 +69,9 @@ namespace itk
 	/**
 	 * Set Radius
 	 */
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::SetRadius( RealType radius )
 	{
 		if(m_Radius != radius)
@@ -84,9 +84,9 @@ namespace itk
 	/**
 	 * Get Radius
 	 */
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
-	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >::RealType
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
+	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >::RealType
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::GetRadius( )
 	{
 		return m_Radius;
@@ -101,9 +101,9 @@ namespace itk
 	 *
 	 * \author Fethallah Benmansour
 	 ***************************************************************************************/
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::GenerateOrientedFluxMatrixElementKernel(InternalComplexImagePointerType &kernel,
 																					InternalComplexImagePointerType &input, 
 																					unsigned int derivA, unsigned int derivB, 
@@ -260,9 +260,9 @@ namespace itk
 	 *
 	 * \author: F. Benmansour
 	 */
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::GenerateData( )
 	{
         InputImageConstPointer inputImage  = this->GetInput();
@@ -337,9 +337,9 @@ namespace itk
         }
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::PrepareInput(const InternalImageType * input,
 								 InternalComplexImagePointerType & preparedInput)
 	{
@@ -348,9 +348,9 @@ namespace itk
 		this->TransformPaddedInput( paddedInput, preparedInput );
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::TransformPaddedInput(const InternalImageType * paddedInput,
 												 InternalComplexImagePointerType & transformedInput)
 	{
@@ -363,9 +363,9 @@ namespace itk
 		transformedInput = imageFFTFilter->GetOutput();
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::PadInput(const InternalImageType * input,
 						 InternalImagePointerType & paddedInput)
 	{
@@ -399,9 +399,9 @@ namespace itk
 		paddedInput = inputPadder->GetOutput();
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
-	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >::InputSizeType
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
+	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >::InputSizeType
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::GetPadLowerBound() const
 	{
 		typename InputImageType::ConstPointer inputImage = this->GetInput();
@@ -416,9 +416,9 @@ namespace itk
 		return inputLowerBound;
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
-	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >::InputSizeType
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
+	typename OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >::InputSizeType
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::GetPadSize() const
 	{
 		typename InputImageType::ConstPointer inputImage = this->GetInput();
@@ -442,18 +442,18 @@ namespace itk
 		return padSize;
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	bool
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::GetXDimensionIsOdd() const
 	{
 		InputSizeType padSize = this->GetPadSize();
 		return (padSize[0] % 2 != 0);
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::ProduceOutput(InternalComplexImageType * paddedOutput, InternalImagePointerType & internalOutput)
 	{
 		typename IFFTFilterType::Pointer ifftFilter = IFFTFilterType::New();
@@ -465,9 +465,9 @@ namespace itk
 		this->CropOutput( ifftFilter->GetOutput(), internalOutput );
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::CropOutput(InternalImageType * paddedOutput, InternalImagePointerType & croppedOutput)
 	{
 		//Initialize the cropped image
@@ -493,9 +493,9 @@ namespace itk
 		extractFilter->Update();
 	}
 	
-	template <typename TInputImage, typename TOutputImage, typename TGradientImageType >
+	template <typename TInputImage, typename TOutputImage >
 	void
-	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage, TGradientImageType >
+	OrientedFluxMatrixImageFilter<TInputImage, TOutputImage >
 	::PrintSelf(std::ostream& os, Indent indent) const
 	{
 		Superclass::PrintSelf(os,indent);

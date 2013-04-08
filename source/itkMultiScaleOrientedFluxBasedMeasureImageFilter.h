@@ -64,7 +64,6 @@ namespace itk
 	 *
 	 */
 	template <typename TInputImage,
-	typename TGradientImage,
 	typename THessianImage, 
 	typename TScaleImage,
 	typename TOrientedFluxToMeasureFilter,
@@ -75,60 +74,57 @@ namespace itk
 	{
 	public:
 		/** Standard class typedefs. */
-		typedef MultiScaleOrientedFluxBasedMeasureImageFilter											Self;
-		typedef ImageToImageFilter<TInputImage, TOutputNDImage>										Superclass;
-		typedef SmartPointer<Self>																								Pointer;
-		typedef SmartPointer<const Self>																					ConstPointer;
+		typedef MultiScaleOrientedFluxBasedMeasureImageFilter		Self;
+		typedef ImageToImageFilter<TInputImage, TOutputNDImage>		Superclass;
+		typedef SmartPointer<Self>									Pointer;
+		typedef SmartPointer<const Self>							ConstPointer;
 		
 		typedef typename NumericTraits
-		<typename TInputImage::PixelType>::ScalarRealType													RealType;
-		typedef TInputImage																												InputImageType;
-		typedef TOutputNDImage																										OutputNDImageType;
-		typedef THessianImage																											HessianImageType;
-		typedef OrientedFluxMatrixImageFilter<InputImageType>									OrientedFluxFilterType;
-		typedef TScaleImage																												ScaleImageType;
-		typedef TOrientedFluxToMeasureFilter																			OrientedFluxToMeasureFilterType;
+		<typename TInputImage::PixelType>::ScalarRealType			RealType;
+		typedef TInputImage											InputImageType;
+		typedef TOutputNDImage										OutputNDImageType;
+		typedef THessianImage										HessianImageType;
+		typedef OrientedFluxMatrixImageFilter<InputImageType>		OrientedFluxFilterType;
+		typedef TScaleImage											ScaleImageType;
+		typedef TOrientedFluxToMeasureFilter						OrientedFluxToMeasureFilterType;
 		
-		typedef typename OrientedFluxFilterType::OutputImageType									OrientedFluxImageType;
-		typedef typename OrientedFluxImageType::Pointer														OrientedFluxImagePointer;
+		typedef typename OrientedFluxFilterType::OutputImageType	OrientedFluxImageType;
+		typedef typename OrientedFluxImageType::Pointer				OrientedFluxImagePointer;
 		
 		/** Declare outputs types */
 		typedef	Image<typename OutputNDImageType::PixelType, 
-		OutputNDImageType::ImageDimension + 1>					OutputNPlus1DImageType;
+		OutputNDImageType::ImageDimension + 1>                      OutputNPlus1DImageType;
 		typedef Image<typename HessianImageType::PixelType, 
 		HessianImageType::ImageDimension + 1>						NPlus1DHessianImageType;
 		
-		typedef typename TInputImage::PixelType																		InputPixelType;
-		typedef typename TInputImage::RegionType																	InputRegionType;
-		typedef typename TOutputNDImage::PixelType																OutputNDPixelType;
-		typedef typename TOutputNDImage::RegionType																OutputNDRegionType;
-		typedef typename OutputNPlus1DImageType::RegionType												OutputNPlus1DRegionType;
+		typedef typename TInputImage::PixelType						InputPixelType;
+		typedef typename TInputImage::RegionType					InputRegionType;
+		typedef typename TOutputNDImage::PixelType					OutputNDPixelType;
+		typedef typename TOutputNDImage::RegionType					OutputNDRegionType;
+		typedef typename OutputNPlus1DImageType::RegionType			OutputNPlus1DRegionType;
 		
-		typedef ImageToImageFilterDetail::ImageRegionCopier<OutputNPlus1DImageType::ImageDimension,
-		InputImageType::ImageDimension>																						InputToOutputRegionCopierType;
+		typedef ImageToImageFilterDetail::ImageRegionCopier
+        <OutputNPlus1DImageType::ImageDimension,
+		InputImageType::ImageDimension>								InputToOutputRegionCopierType;
 		
 		/** Image dimension. */
 		itkStaticConstMacro(ImageDimension, unsigned int, InputImageType::ImageDimension);
 		
 		/** Types for Scale image */
-		typedef typename ScaleImageType::PixelType																ScalePixelType;
-		
-		/** External gradient  */
-		typedef TGradientImage																						GradientImageType;
-		typedef typename GradientImageType::Pointer												GradientImagePointer;
-		typedef typename GradientImageType::ConstPointer									GradientImageConstPointer;
+		typedef typename ScaleImageType::PixelType					ScalePixelType;
 		
 		/** Update image buffer that holds the best objectness response. This is not redundant from
 		 the output image because the latter may not be of float type, which is required for the comparisons 
 		 between responses at different scales. */ 
-		typedef Image< double, itkGetStaticConstMacro(ImageDimension) >						UpdateBufferType;
-		typedef typename UpdateBufferType::ValueType															BufferValueType;
+		typedef Image
+        < double, itkGetStaticConstMacro(ImageDimension) >			UpdateBufferType;
+		typedef typename UpdateBufferType::ValueType				BufferValueType;
     
-		typedef typename Superclass::DataObjectPointer														DataObjectPointer;
+		typedef typename Superclass::DataObjectPointer				DataObjectPointer;
 		
 		typedef OrientedFluxMatrixImageFilter
-		< InputImageType, HessianImageType, GradientImageType >										FFTOrientedFluxType;
-		typedef typename OutputNDImageType::Pointer																OutputNDImagePointer;
+		< InputImageType, HessianImageType >						FFTOrientedFluxType;
+		typedef typename OutputNDImageType::Pointer					OutputNDImagePointer;
 		
 		/** Method for creation through the object factory. */
 		itkNewMacro(Self);
@@ -240,22 +236,20 @@ namespace itk
 		MultiScaleOrientedFluxBasedMeasureImageFilter(const Self&); 
 		void operator=(const Self&); //purposely not implemented
 		
-		double																						m_SigmaMinimum;
-		double																						m_SigmaMaximum;
-		unsigned int																			m_NumberOfSigmaSteps;
-		std::vector< RealType >														m_Sigmas;
-		
-		double																						m_FixedSigmaForHessianImage;
-		//typename OrientedFluxToMeasureFilterType::Pointer	m_OrientedFluxToMeasureFilter;
+		double                                                              m_SigmaMinimum;
+		double                                                              m_SigmaMaximum;
+		unsigned int                                                        m_NumberOfSigmaSteps;
+		std::vector< RealType >                                             m_Sigmas;
+		double                                                              m_FixedSigmaForHessianImage;
 		std::vector<typename OrientedFluxToMeasureFilterType::Pointer>		m_OrientedFluxToMeasureFilterList;
-		typename UpdateBufferType::Pointer								m_UpdateBuffer;
+		typename UpdateBufferType::Pointer                                  m_UpdateBuffer;
 		
-		bool																							m_GenerateScaleOutput;
-		bool																							m_GenerateHessianOutput;
-		bool																							m_GenerateNPlus1DHessianOutput;	
-		bool																							m_GenerateNPlus1DHessianMeasureOutput;
+		bool                                                                m_GenerateScaleOutput;
+		bool																m_GenerateHessianOutput;
+		bool																m_GenerateNPlus1DHessianOutput;
+		bool																m_GenerateNPlus1DHessianMeasureOutput;
 		
-		bool																							m_BrightObject;
+		bool																m_BrightObject;
 		
 	};
 	

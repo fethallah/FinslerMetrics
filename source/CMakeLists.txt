@@ -45,16 +45,16 @@ TARGET_LINK_LIBRARIES(itkMultiScaleOrientedFluxBasedMeasureImageFilter ${Librari
 
 ########################################## testing ##########################################
 ####### Synthetic-02 #######
-ADD_TEST(tubularity2D-Synthetic-02 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/Synthetic-02.png 0 0 outputs/Synthetic-02_tubularity.nrrd 1 outputs/Synthetic-02_scale_space_tubularity.nrrd 0 0 0 0 0 0 4 8 9 0.5 1 1 100000
+ADD_TEST(tubularity2D-Synthetic-02 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/Synthetic-02.png outputs/Synthetic-02_tubularity.nii 1 outputs/Synthetic-02_scale_space_tubularity.nii 1 outputs/Synthetic-02_OF_Matrix.nii 1 outputs/Synthetic-02_scale_space_OF_Matrix.nii 0 0 4 8 9 0.5 1 1 100000
 )
 
 ####### Real-DSA-01 #######
 
-ADD_TEST(tubularity2D-Real-DSA-01 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/Real-DSA-01.jpg 0 0 outputs/Real-DSA-01_tubularity.nrrd 1 outputs/Real-DSA-01_scale_space_tubularity.nrrd 0 0 0 0 0 0 1 9 17 0.5 0 1 100000)
+ADD_TEST(tubularity2D-Real-DSA-01 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/Real-DSA-01.jpg outputs/Real-DSA-01_tubularity.nii 1 outputs/Real-DSA-01_scale_space_tubularity.nii 1 outputs/Real-DSA-01_OF_Matrix.nii 1 outputs/Real-DSA-01_scale_space_OF_Matrix.nii 0 0 1 9 17 0.5 0 1 100000)
 
 ####### OP_1 #######
 
-ADD_TEST(tubularity3D-OP_1 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/OP_1.tif 0 0 outputs/OP_1_tubularity.nrrd 1 outputs/OP_1_scale_space_tubularity.nrrd 0 0 0 0 0 0 1 6 11 0.5 1 1 100000)
+ADD_TEST(tubularity3D-OP_1 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/OP_1.tif outputs/OP_1_tubularity.nii 1 outputs/OP_1_scale_space_tubularity.nii 1 outputs/OP_1_OF_Matrix.nii 1 outputs/OP_1_scale_space_OF_Matrix.nii 0 0 1 6 11 0.5 1 1 100000)
 
 ########################################## testing done ##########################################
 

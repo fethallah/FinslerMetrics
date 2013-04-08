@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////
-//																																							//
-// Copyright (C) 2012 Engin Turetken & Fethallah Benmansour											//
-//																																							//
+//                                                                              //
+// Copyright (C) 2013  Fethallah Benmansour						//
+//																				//
 // This program is free software: you can redistribute it and/or modify         //
 // it under the terms of the version 3 of the GNU General Public License        //
 // as published by the Free Software Foundation.                                //
@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License            //
 // along with this program. If not, see <http://www.gnu.org/licenses/>.         //
 //                                                                              //
-// Contact <engin.turetken@epfl.ch> for comments & bug reports                  //
+// Contact <fethallah@gmail.com> for comments & bug reports                  //
 //////////////////////////////////////////////////////////////////////////////////
 
 #if defined(_MSC_VER)
@@ -61,7 +61,6 @@ void Usage(char* argv[])
 	std::cerr << "Usage: " << std::endl
 	<< argv[0] << std::endl
 	<< " <input image file>" << std::endl
-	<< " <is gradient precomputed (yes=1/no=0)> <precomputed gradient image filename> " << std::endl
 	<< " <output tubularity score image file> " << std::endl 
 	<< " <generate (N+1)-D scale space tubularity score image (yes=1/no=0)> <output (N+1)-D tubularity score image file> " << std::endl 	
 	<< " <generate Oriented Flux matrix image (yes=1/no=0)> <output Oriented Flux matrix image file> " << std::endl 
@@ -199,43 +198,41 @@ int Execute(int argc, char* argv[])
 	const unsigned int Dimension = VDimension;
 	
 	// Typedefs
-	typedef TInputPixel																			InputPixelType;
+	typedef TInputPixel													InputPixelType;
 	typedef itk::Image<InputPixelType,Dimension>						InputImageType;
 	
-	
-	typedef float																						OutputPixelType;
+	typedef float														OutputPixelType;
 	typedef itk::Image<OutputPixelType,Dimension>						OutputImageType;
-	typedef itk::Image<OutputPixelType,Dimension+1>					OutputScaleSpaceImageType;
-	
-	typedef itk::CovariantVector<OutputPixelType, Dimension> GradientVectorType;
-	typedef itk::Image<GradientVectorType,Dimension>				 GradientImageType;
+	typedef itk::Image<OutputPixelType,Dimension+1>                     OutputScaleSpaceImageType;
 	
 	typedef itk::ImageFileReader<InputImageType>						FileReaderType;
-	typedef itk::ImageFileReader<GradientImageType>					GradientReaderType;
 	typedef itk::ImageFileWriter<OutputImageType>						FileWriterType;
-	typedef itk::ImageFileWriter<OutputScaleSpaceImageType> ScaleSpaceImageFileWriterType;
+	typedef itk::ImageFileWriter<OutputScaleSpaceImageType>             ScaleSpaceImageFileWriterType;
 	
-	typedef float																						OrientedFluxPixelScalarType;
-	typedef itk::SymmetricSecondRankTensor< OrientedFluxPixelScalarType, Dimension > OrientedFluxPixelType;
-	
-	OrientedFluxPixelType examplePixel;
+	typedef float														OrientedFluxPixelScalarType;
+	typedef itk::SymmetricSecondRankTensor
+    < OrientedFluxPixelScalarType, Dimension >                          OrientedFluxPixelType;
 	
 	typedef itk::Image< OrientedFluxPixelType, Dimension >				OrientedFluxImageType;
 	typedef itk::Image< OrientedFluxPixelType, Dimension+1 >			NPlus1DOrientedFluxImageType;	
 	
-	typedef float																						ScalePixelType;
+	typedef float														ScalePixelType;
 	typedef itk::Image<ScalePixelType, Dimension>						ScaleImageType;
 	
 	typedef itk::ImageFileWriter<OrientedFluxImageType>					OrientedFluxFileWriterType;
-	typedef itk::ImageFileWriter<NPlus1DOrientedFluxImageType>		NPlus1DOrientedFluxFileWriterType;	
+	typedef itk::ImageFileWriter<NPlus1DOrientedFluxImageType>          NPlus1DOrientedFluxFileWriterType;
 	typedef itk::ImageFileWriter<ScaleImageType>						ScaleFileWriterType;
 	
-	typedef itk::ShiftScaleImageFilter<OutputImageType, OutputImageType>	ShiftScaleFilterType;
-	typedef itk::MinimumMaximumImageCalculator<OutputImageType>						MinMaxCalculatorType;
-	typedef itk::ShiftScaleImageFilter<OutputScaleSpaceImageType, OutputScaleSpaceImageType>	ShiftScaleFilterForScaleSpaceImageType;
-	typedef itk::MinimumMaximumImageCalculator<OutputScaleSpaceImageType>											MinMaxCalculatorForScaleSpaceImageType;
-	typedef itk::ExpImageFilter<OutputImageType, OutputImageType> ExpFilterType;
-	typedef itk::ExpImageFilter<OutputScaleSpaceImageType, OutputScaleSpaceImageType> ScaleSpaceExpFilterType;
+	typedef itk::ShiftScaleImageFilter
+    <OutputImageType, OutputImageType>                                  ShiftScaleFilterType;
+	typedef itk::MinimumMaximumImageCalculator<OutputImageType>			MinMaxCalculatorType;
+	typedef itk::ShiftScaleImageFilter
+    <OutputScaleSpaceImageType, OutputScaleSpaceImageType>              ShiftScaleFilterForScaleSpaceImageType;
+	typedef itk::MinimumMaximumImageCalculator
+    <OutputScaleSpaceImageType>											MinMaxCalculatorForScaleSpaceImageType;
+	typedef itk::ExpImageFilter<OutputImageType, OutputImageType>       ExpFilterType;
+	typedef itk::ExpImageFilter
+    <OutputScaleSpaceImageType, OutputScaleSpaceImageType>              ScaleSpaceExpFilterType;
 	
 	
 	
@@ -245,16 +242,14 @@ int Execute(int argc, char* argv[])
 	typedef itk::ProcessObject MultiScaleEnhancementBaseFilterType;
 	
 	typedef itk::MultiScaleOrientedFluxBasedMeasureImageFilter< InputImageType, 
-	GradientImageType,
 	OrientedFluxImageType, 
 	ScaleImageType,
 	OrientedFluxCrossSectionTraceObjectnessFilterType, 
-	OutputImageType > OrientedFluxCrossSectionTraceMultiScaleEnhancementFilterType;	
-	
+	OutputImageType > OrientedFluxCrossSectionTraceMultiScaleEnhancementFilterType;
+    
 	// Parse the input arguments.
 	unsigned int argumentOffset = 1;
 	std::string inputImageFilePath = argv[argumentOffset++];
-	std::string gradientImageFilePath = argv[argumentOffset++];
 	std::string outputTubularityScoreImageFilePath = argv[argumentOffset++];
 	bool generateScaleSpaceTubularityScoreImage = (bool)atoi(argv[argumentOffset++]);
 	std::string outputScaleSpaceTubularityScoreImageFilePath = argv[argumentOffset++];

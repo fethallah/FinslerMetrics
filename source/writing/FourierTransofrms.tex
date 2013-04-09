@@ -1,0 +1,124 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{epstopdf}
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+\author {F. Benmansour}
+\title{\textit{The Fourier transforms of the Oriented Flux and the flux anti-symmetry filters}}
+\begin{document}
+\maketitle
+
+\section{Definitions and notations}
+\begin{itemize}
+\item The normalised oriented flux matrix of an image $I$ is defined as follows [Law08] :
+\begin{equation}\label{eq:OF}
+\forall x\in\mathbb{R}^n,\forall r >0, ~~\mathcal{F}(x, r) = (I* \partial_{i, j} g_{\sigma} *\mathds{1}_r)(x)
+\end{equation}
+where, $g_\sigma$ is the Gausian function with standard deviation $\sigma$, and $\mathds{1}_r = 1/ \mathcal{N}(r)$ if $\|x\| < r$ and 0 otherwise, where $\mathcal{N}(r)$ is the flux normalisation term. Typically, for $n = 3$,  $\mathcal{N}(r) = 4\pi r^2$ and for $n = 2$, $\mathcal{N}(r) = 2\pi r$.
+\item The normalised anti-symmetry flux vector is defined as follows [Law10]:
+\begin{equation}\label{eq:AF}
+\forall x\in\mathbb{R}^n,\forall r >0, ~~\mathcal{AS}(x, r) = (I* \partial_{i} g_{\sigma} *\Delta_r)(x)
+\end{equation}
+where $\Delta_r(x) = 1/ \mathcal{N}(r)$ if $\|x\| = r$ and 0 otherwise.
+\end{itemize}
+
+\section{Fourier transforms: definitions and useful properties}
+We are interested to compute the Fourier transforms of the previous filters using ordinary frequencies, that is the Fourier transform of a function $f:\mathbb{R}^n\rightarrow \mathbb{R}$ writes
+\begin{equation}\label{eq:FourierDef}
+\forall u\in\mathbb{R}^n,  \hat{f}(u) = \int_{\mathbb{R}^n} f(x)e^{-2\pi i <x, u>} \mathrm{d}^n x
+\end{equation}
+
+Let us recall the following properties:
+\begin{itemize}
+\item $\widehat{f*g} = \hat{f} . \hat{g}$.
+\item $\widehat{\partial_k f} = 2\pi i u_k \hat{f}$.
+\item According to theorem 3 in \texttt{http://math.arizona.edu/~faris/methodsweb/hankel.pdf}, for a spherically symmetric function $f$, 
+by setting $\mathbf{k} = 2\pi u$ and hence $s = 2\pi \| u\|$ (and by setting $t = r$ in the integral), we have,
+\begin{equation}\label{eq:Hankel}
+\forall u\in\mathbb{R}^n,  \hat{f}(u) = 2\pi \|u\|^{1-\frac{n}{2}} \int_0^\infty J_{\frac{n}{2}-1}(2\pi \|u\| t) ~t^{\frac{n}{2}}~ F(t) ~\mathrm{d}t
+\end{equation}
+\end{itemize}
+where $F(\|x\|) = f(x)$ and $J_d$ is the Bessel function of first kind of order $d$.
+
+
+\section{Computing the Fourier transforms of the flux filters}
+\subsection{Fourier transforms of the derivative terms}
+\begin{itemize}
+\item Gaussian
+\begin{equation}\label{eq:FourierTransforGaussian}
+\forall u\in\mathbb{R}^n,  \widehat{g_\sigma}(u) = \frac{1}{\sqrt{2\pi\sigma^2}^n} \sqrt{2\pi\sigma^2}^n  \exp(-2 (\pi \sigma \|u\|)^2) = \exp(-2 (\pi \sigma \|u\|)^2).
+\end{equation}
+\item First derivative
+\begin{equation}\label{eq:FirstDerivative}
+\forall u\in\mathbb{R}^n,  \widehat{\partial_k g_\sigma}(u) = 2\pi i u_k \widehat{g_\sigma}(u) = 2\pi i u_k \exp(-2 (\pi \sigma \|u\|)^2).
+\end{equation}
+\item Second derivative
+\begin{equation}\label{eq:SecondDerivative}
+\forall u\in\mathbb{R}^n,  \widehat{\partial_{j,k} g_\sigma}(u) = (2\pi i u_j) (2\pi i u_k) \widehat{g_\sigma}(u) = -(2\pi)^2  u_k u_j \exp(-2 (\pi \sigma \|u\|)^2).
+\end{equation}
+\end{itemize}
+\subsection{Fourier transforms of the oriented flux kernel term}
+\begin{itemize}
+\item if the dimension is even, that is $n = 2p$, then, from equation (\ref{eq:Hankel})
+\begin{equation}\label{eq:OFKernelEven}
+\forall u\in\mathbb{R}^n,  \widehat{\mathds{1}_r} (u) = \frac{2\pi \|u\|^{1-p}}{\mathcal{N}(r)}  \int_0^r J_{p-1}(2\pi \|u\| t) ~t^{p} ~\mathrm{d}t
+\end{equation}
+by change of variable $t' = 2\pi \|u\| t$ and thanks to $\frac{d}{dx}\left[x^n J_n\right] = x^n J_{n-1}$ (see equation (59) in \texttt{http://mathworld.wolfram.com/BesselFunctionoftheFirstKind.html}), we obtain:
+\begin{equation}\label{eq:OFKernelEven2}
+\forall u\in\mathbb{R}^n,  \widehat{\mathds{1}_r} (u) = \frac{r^p}{\mathcal{N}(r)}\frac{J_p(2\pi \|u\|r)}{\|u\|^p} =2^{p-1} (p-1)!~ r   \frac{J_p(2\pi \|u\|r)}{(2\pi \|u\|r)^p}
+\end{equation}
+\item if the dimension is odd, that is $n = 2p+1$, then, from equation (\ref{eq:Hankel})
+\begin{equation}\label{eq:OFKernelOdd}
+\forall u\in\mathbb{R}^n,  \widehat{\mathds{1}_r} (u) = \frac{2\pi \|u\|^{-p+\frac{1}{2}}}{\mathcal{N}(r)}  \int_0^r J_{p-\frac{1}{2}}(2\pi \|u\| t) ~t^{p+\frac{1}{2}} ~\mathrm{d}t.
+\end{equation}
+Thanks to $j_p(x) = \sqrt{\frac{\pi}{2 x}}J_{p+\frac{1}{2}}(x)$, and by the same previous change of variable, and thanks to $\frac{d}{dx}[x^{p+1}j_p(x)] = j_{p-1}(x)x^{p+1}$, we have:
+\begin{equation}\label{eq:OFKernelOdd2}
+\forall u\in\mathbb{R}^n,  \widehat{\mathds{1}_r} (u)  = \frac{4\pi \|u\|^{1-p}}{\mathcal{N}(r)} \frac{1}{(2\pi\|u\|)^{p+2}} [t'^{p+1} j_p(t')]_0^{2\pi \|u\|r} = \frac{(2p)!}{2^p p!} ~r~ \frac{j_p(2\pi \|u\|r)}{(2\pi \|u\|r)^p}.
+\end{equation}
+
+We are mostly interested by the case $n=3$, that is $p=1$, we have:
+
+% = \frac{2\pi \|u\|^{-\frac{1}{2}}}{4\pi r^2} \sqrt{\frac{2}{\pi}} \frac{1}{(2\pi\|u\|)^{\frac{5}{2}}}\int_0^{2\pi \|u\|r} t'\sin(t')~\mathrm{d}t'
+\begin{equation}\label{eq:OFKernelOdd3}
+\forall u\in\mathbb{R}^n,  \widehat{\mathds{1}_r} (u)  = \frac{1}{2\pi \|u\|} j_1(2\pi \|u\|r)=\frac{1}{2\pi \|u\|}  \frac{\sin(2\pi \|u\|r) -(2\pi \|u\|r) \cos(2\pi \|u\|r))}{(2\pi \|u\|r)^2}
+\end{equation}
+\end{itemize}
+If one normalises  equation (8) in [Law08] by dividing it by $4\pi r^2$, then we obtain the exact same expression using equations (\ref{eq:OFKernelOdd3}) and (\ref{eq:SecondDerivative}).
+
+\subsection{Fourier transforms of the flux anti-symmetry kernel}
+Thanks to equation (\ref{eq:Hankel})
+\begin{equation}\label{eq:ASKernel0}
+\forall u\in\mathbb{R}^n,  \widehat{\Delta_r} (u) =  2\pi \|u\|^{-\frac{n-2}{2}} J_{\frac{n-2}{2}}(2\pi \|u\| r) ~\frac{r^{\frac{n}{2}}  }{\mathcal{N}(r)}
+\end{equation}
+from \texttt{http://en.wikipedia.org/wiki/N-sphere\#Volume\_and\_surface\_area}, one has $\mathcal{N}(r) = \mathcal{N}_n(r) = \frac{2 \pi^\frac{n}{2} r^{n-1}}{\Gamma(\frac{n}{2})}$. Again, one can distinguish between the 2 following cases:
+\begin{itemize}
+\item if the dimension is even, that is $n = 2p$, then,
+\begin{equation}\label{eq:ASKernelEven}
+\forall u\in\mathbb{R}^n,  \widehat{\Delta_r} (u) =  (p-1)! 2^{p-1} \frac{J_{p-1}(2\pi \|u\| r)}{(2\pi \|u\| r)^{p-1}}
+\end{equation}
+\item if the dimension is odd, that is $n = 2p+1$, then,
+\begin{equation}\label{eq:ASKernelOdd1}
+\forall u\in\mathbb{R}^n,  \widehat{\Delta_r} (u) =  2^{p-\frac{1}{2}}\Gamma\left(p + \frac{1}{2}\right) \frac{J_{p-\frac{1}{2}}(2\pi \|u\| r)}{(2\pi \|u\| r)^{p-\frac{1}{2}}}
+\end{equation}
+In addition, we have the following relation to spherical Bessel functions: $j_p(x) = \sqrt{\frac{\pi}{2 x}}J_{p+\frac{1}{2}}(x)$. Finally, 
+\begin{equation}\label{eq:ASKernelOdd2}
+\forall u\in\mathbb{R}^n,  \widehat{\Delta_r} (u) = \frac{2^{p}\Gamma\left(p + \frac{1}{2}\right)}{\sqrt{\pi}} \frac{j_{p-1}(2\pi \|u\| r)}{(2\pi \|u\| r)^{p-1} } = \frac{(2p)!}{2^p p!} \frac{j_{p-1}(2\pi \|u\| r)}{(2\pi \|u\| r)^{p-1} }
+\end{equation}
+\end{itemize}
+Typically, for $n=3$, that is $p=1$, one has (thanks to $\Gamma(n+\frac{1}{2}) = \frac{(2n)!}{4^n n!}\sqrt{\pi}$):
+\begin{equation}\label{eq:ASKernelOdd3}
+\forall u\in\mathbb{R}^n,  \widehat{\Delta_r} (u) =  j_{0}(2\pi \|u\| r) =  \frac{\sin(2\pi \|u\| r)}{2\pi \|u\| r}
+\end{equation}
+
+Compared to equation (9) in [Law10], we obtain the exact same expression by multiplying equations (\ref{eq:ASKernelOdd3}) and (\ref{eq:FirstDerivative}).
+
+\subsection{Implementation}
+\begin{itemize}
+\item For function $J_n$ with $n$ integer, use the function \texttt{vnl\_bessel}.
+\item For the function $j_n$ with $n$ integer, use the function \texttt{boost::math::tr1::sph\_bessel}.
+\end{itemize}
+\end{document}

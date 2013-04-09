@@ -5,6 +5,8 @@
 \usepackage{amssymb}
 \usepackage{dsfont}
 \usepackage{epstopdf}
+\usepackage{array}
+\usepackage{booktabs}%
 
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 \author {F. Benmansour}
@@ -121,4 +123,49 @@ Compared to equation (9) in [Law10], we obtain the exact same expression by mult
 \item For function $J_n$ with $n$ integer, use the function \texttt{vnl\_bessel}.
 \item For the function $j_n$ with $n$ integer, use the function \texttt{boost::math::tr1::sph\_bessel}.
 \end{itemize}
+
+\subsection{Summary}
+This table summarises the implementation.\\
+
+\begin{tabular}{|c|c|}
+        \hline
+           \text{Filter} & \text{Fourier Transform using ordinary frequencies} \\
+        \hline
+             $\bullet$  \text{ Oriented Flux Filter } &  \\
+             $\forall x\in\mathbb{R}^n,\mathcal{F}(x, r) = (I* \partial_{i, j} g_{\sigma} *\mathds{1}_r)(x)$&  \\
+             with $g_{\sigma} (x) = \frac{1}{\left(\sqrt{2\pi \sigma^2}\right)^n} e^{-\frac{\|x\|^2}{2\sigma^2}}$& $\widehat{\partial_{i,j} g_\sigma}(u) = -(2\pi)^2  u_i u_j \exp(-2 (\pi \sigma \|u\|)^2)$ \\
+             and $\mathds{1}_r(x) = \left\{ 
+             \begin{array}{cc}
+             \frac{1}{\mathcal{N}(r)} & \text{ if } \|x\|\leq r \\
+	   0 & \text{ otherwise}	
+             \end{array}
+             \right.$& 
+             $\displaystyle\widehat{\mathds{1}_r} (u) = \left \{
+             \begin{array}{cccc} 
+             2^{p-1} (p-1)!&\displaystyle r~ \frac{J_p(2\pi \|u\|r)}{(2\pi \|u\|r)^p} & \text{ if } &n = 2p \\
+             & & &  \\
+             \displaystyle\frac{(2p)!}{2^p p!} &\displaystyle r~ \frac{j_p(2\pi \|u\|r)}{(2\pi \|u\|r)^p}& \text{ if } &n = 2p+1
+             \end{array}
+             \right.
+             $ \\
+                     \hline
+             $\bullet$  \text{ Oriented Flux Filter } &  \\
+             $\forall x\in\mathbb{R}^n,\mathcal{F}(x, r) =(I* \partial_{i} g_{\sigma} *\Delta_r)(x)$&  \\
+             with $g_{\sigma} (x) = \frac{1}{\left(\sqrt{2\pi \sigma^2}\right)^n} e^{-\frac{\|x\|^2}{2\sigma^2}}$& $\widehat{\partial_{j} g_\sigma}(u) = i 2\pi u_j \exp(-2 (\pi \sigma \|u\|)^2)$ \\
+             and $\Delta_r(x) = \left\{ 
+             \begin{array}{cc}
+             \frac{1}{\mathcal{N}(r)} & \text{ if } \|x\|= r \\
+	   0 & \text{ otherwise}	
+             \end{array}
+             \right.$& 
+             $\displaystyle\widehat{\Delta_r} (u) = \left \{
+             \begin{array}{cccc} 
+             2^{p-1} (p-1)!&\displaystyle \frac{J_{p-1}(2\pi \|u\| r)}{(2\pi \|u\| r)^{p-1}} & \text{ if } &n = 2p \\
+             & & &  \\
+             \displaystyle\frac{(2p)!}{2^p p!} &\displaystyle \frac{j_{p-1}(2\pi \|u\| r)}{(2\pi \|u\| r)^{p-1} }& \text{ if } &n = 2p+1
+             \end{array}
+             \right.
+             $ \\        \hline
+    \end{tabular}
+
 \end{document}

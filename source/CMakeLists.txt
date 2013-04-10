@@ -61,6 +61,12 @@ ADD_TEST(tubularity2D-Real-DSA-01 itkMultiScaleOrientedFluxBasedMeasureImageFilt
 
 ADD_TEST(Riemannian2D-Real-DSA-01 GenerateRiemannianMetrics outputs/Real-DSA-01_OF_Matrix.nii outputs/Real-DSA-01_Riemannian_Metric.nii 0 10 1 1 outputs/Real-DSA-01__Tensor_Glyph.vtk 0.005)
 
+####### Real-DSA-02 #######
+
+ADD_TEST(tubularity2D-Real-DSA-02 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/Real-DSA-02.tif outputs/Real-DSA-02_tubularity.nii 1 outputs/Real-DSA-02_scale_space_tubularity.nii 1 outputs/Real-DSA-02_OF_Matrix.nii 1 outputs/Real-DSA-02_scale_space_OF_Matrix.nii 0 0 1 9 17 0.5 0 1 100000)
+
+ADD_TEST(Riemannian2D-Real-DSA-02 GenerateRiemannianMetrics outputs/Real-DSA-02_OF_Matrix.nii outputs/Real-DSA-02_Riemannian_Metric.nii 0 10 1 1 outputs/Real-DSA-02__Tensor_Glyph.vtk 0.05)
+
 ####### OP_1 #######
 
 ADD_TEST(tubularity3D-OP_1 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/OP_1.tif outputs/OP_1_tubularity.nii 1 outputs/OP_1_scale_space_tubularity.nii 1 outputs/OP_1_OF_Matrix.nii 1 outputs/OP_1_scale_space_OF_Matrix.nii 0 0 1 6 11 0.5 1 1 100000)

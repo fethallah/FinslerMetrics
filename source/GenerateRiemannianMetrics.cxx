@@ -30,6 +30,8 @@
 
 const unsigned int maxDimension = 3;
 
+#define SORTING_BY_ANISOTROPY_RATIO 1
+#define SORTING_BY_MAGNITUDE        2
 
 
 // Get the PixelType, the ComponentType and the number of dimensions
@@ -215,6 +217,7 @@ int GenerateSpatialRiemannianMetricFromOrientedFluxMatrix(int argc, char* argv[]
 	unsigned int argumentOffset = 1;
 	std::string inputOFImageFilePath            = argv[argumentOffset++];
     std::string outputRiemannianMetricFilePath  = argv[argumentOffset++];
+    bool        brightObjects                   = (bool)atoi(argv[argumentOffset++]);
     double      maxAnisotropyRatio              = atof(argv[argumentOffset++]);
     double      scaleSpeedRatio                 = atof(argv[argumentOffset++]);
     bool        generateGlyph                   = (bool)atoi(argv[argumentOffset++]);
@@ -261,11 +264,20 @@ int GenerateSpatialRiemannianMetricFromOrientedFluxMatrix(int argc, char* argv[]
     
     itkAssertOrThrowMacro(max_Lambda_n_minus_Lambda_1 > 0, "max_Lambda_n_minus_Lambda_1 = 0, not interesting image of computation went wrong");
     // compute alpha
-    double alpha = 2*log(maxAnisotropyRatio) / max_Lambda_n_minus_Lambda_1;
+    double alpha;
+    if(brightObjects)
+    {
+        alpha = 2*log(maxAnisotropyRatio) / max_Lambda_n_minus_Lambda_1;
+    }
+    else
+    {
+        alpha = -2*log(maxAnisotropyRatio) / max_Lambda_n_minus_Lambda_1;
+    }
     
     auto outIt = itk::ImageRegionIterator<TInputImageType>(outputMetricImage, OFMatrixImage->GetLargestPossibleRegion());
     inIt.GoToBegin();
     outIt.GoToBegin();
+    
     while(!inIt.IsAtEnd())
     {
         SymmetrixMatrixType outputMetric;
@@ -333,11 +345,12 @@ void Usage(char* argv[])
 	<< argv[0] << std::endl
 	<< " <input Oriented Flux Image Matrix Image file (could be scale space or space only)> " << std::endl
 	<< " <output Riemannian Metric file> " << std::endl
+    << " <BrightOjects> " << std::endl
     << " <maximum anisotropy ratio> " << std::endl
     << " <scale Speed Ratio (needed only for the scale space case)> " << std::endl
     << " <generate glyph (for visulizing the Riemannian metric)> " << std::endl
     << " <if the previous is true, where to write the file to be visualized with Paraview> " << std::endl
-    << " <percentage of tensors to visualize(sorted by max speed)> " << std::endl
+    << " <percentage of best tensors to visualize according to the sorting by magnitude> " << std::endl
 	<< std::endl << std::endl;
 }
 
@@ -345,7 +358,7 @@ void Usage(char* argv[])
 // Check the arguments and try to parse the input image.
 int main ( int argc, char* argv[] )
 {
-	if(argc < 2)
+	if(argc < 9)
 	{
 		Usage(argv);
 		return EXIT_FAILURE;

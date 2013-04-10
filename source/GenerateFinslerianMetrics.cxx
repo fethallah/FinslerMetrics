@@ -52,7 +52,149 @@ void GetImageType (std::string							fileName,
 	noOfDimensions  = reader->GetImageIO()->GetNumberOfDimensions();
     noOfComponents  = reader->GetImageIO()->GetNumberOfComponents();
     
-} 
+}
+
+template<class TSymmetricDefinitePositveImageType >
+void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveImageType::Pointer outputMetricImage, std::string glyphFileName, double percent)
+{
+    // first make the list of locations and the associated list of tensors
+    // one could first sort all the pixels in outputMetricImage according to:
+    //          1/ their anisotropy ratio
+    //          2/ their maximal speed (which is the sqrt of the highest eigenvalue)
+    //          3/ or just make a random selection
+    // once they are sorted(selected), one can select a proportion of the best ones, for instance the 10% highest
+        
+    unsigned int const Dimension = TSymmetricDefinitePositveImageType::ImageDimension;
+    typedef typename TSymmetricDefinitePositveImageType::PointType      LocationType;
+    typedef typename TSymmetricDefinitePositveImageType::PixelType      TensorType;
+    typedef itk::Vector<double, Dimension>                              EigenValuesType;
+    typedef itk::Matrix<double, Dimension>                              EigenVectorsType;
+    typedef itk::SymmetricEigenAnalysis
+    <TensorType,
+    EigenValuesType,
+    EigenVectorsType>                                                   EigenAnalysisType;
+
+    std::vector<LocationType>   listOfLocations;    listOfLocations.clear();
+    std::vector<TensorType>     listOfTensors;      listOfTensors.clear();
+    std::vector<double>         listOfScores;       listOfTensors.clear();
+    
+    EigenAnalysisType symmetricEigenAnalysis(Dimension);
+    EigenValuesType  eigenValues;
+    
+    
+    auto tensorsIt = itk::ImageRegionConstIterator<TSymmetricDefinitePositveImageType> (outputMetricImage, outputMetricImage->GetBufferedRegion());
+    
+    std::vector<double> listOfMaxSpeeds; listOfMaxSpeeds.clear();
+    tensorsIt.GoToBegin();
+    while (!tensorsIt.IsAtEnd())
+    {
+        symmetricEigenAnalysis.ComputeEigenValues(tensorsIt.Get(), eigenValues );
+        listOfMaxSpeeds.push_back(eigenValues[Dimension-1]);
+        ++tensorsIt;
+    }
+    std::cout << "start sorting" << std::endl;
+    std::sort(listOfMaxSpeeds.begin(), listOfMaxSpeeds.end()) ;
+    
+    unsigned int idxPercent = floor(listOfMaxSpeeds.size() *(1-percent));
+    double threshold_value = listOfMaxSpeeds[idxPercent];
+    
+    tensorsIt.GoToBegin();
+    while (!tensorsIt.IsAtEnd())
+    {
+        TensorType currentTensor = tensorsIt.Get();
+        symmetricEigenAnalysis.ComputeEigenValues(currentTensor, eigenValues );
+        LocationType pt;
+        
+        if(eigenValues[Dimension-1] > threshold_value)
+        {
+            auto idx = tensorsIt.GetIndex();
+            outputMetricImage->TransformIndexToPhysicalPoint(idx, pt);
+            listOfLocations.push_back(pt);
+            listOfTensors.push_back(currentTensor);
+            listOfScores.push_back(eigenValues[Dimension-1]);
+        }
+        
+        ++tensorsIt;
+    }
+        
+        
+        
+    // write to a file
+    FILE* fid = fopen(glyphFileName.c_str(), "w");
+	//ASCII file header
+	fprintf(fid, "# vtk DataFile Version 3.0\n");
+	fprintf(fid, "Random data to test tensors \n");
+	fprintf(fid, "ASCII\n");
+	fprintf(fid, "DATASET UNSTRUCTURED_GRID\n");
+	fprintf(fid, "POINTS %d float\n", int(listOfLocations.size()));
+	fclose(fid);
+	//append binary x,y,z data
+	fid = fopen(glyphFileName.c_str(), "a");
+	for (unsigned int i = 0; i < listOfLocations.size(); i++)
+	{
+		for (unsigned int j = 0; j < Dimension; j++)
+		{
+			float value = float( (listOfLocations[i])[j] );
+			fprintf(fid, "%f ", value);
+		}
+        if(Dimension == 2)
+        {
+            fprintf(fid, "%f ", 0.0);
+        }
+		fprintf(fid, "\n");
+	}
+	
+//    fprintf(fid, "\nCELLS 1 9\n");
+//    fprintf(fid, "8 1 2 3 4 5 6 7 0\n\n");//
+//    fprintf(fid, "CELL_TYPES 1\n");
+//    fprintf(fid, "11\n\n");
+    
+    fprintf(fid, "POINT_DATA %d\n", int(listOfLocations.size()));
+    fprintf(fid, "SCALARS scalars float\n");
+    fprintf(fid, "LOOKUP_TABLE default\n");
+    for (unsigned int i = 0; i < listOfLocations.size(); i++)
+	{
+		float value = listOfScores[i];
+		fprintf(fid, "%f ", value);
+	}
+    fprintf(fid, "\n");
+    
+//	fprintf(fid, "\nPOINT_DATA %d\n", listOfLocations.size());
+	//append another ASCII sub header
+    
+	fprintf(fid, "\nTENSORS %s float\n", "tensors1");
+    
+	//append binary u,v,w data
+	for (unsigned int i = 0; i < listOfLocations.size(); i++)
+	{
+        
+        symmetricEigenAnalysis.ComputeEigenValues(listOfTensors[i], eigenValues );
+		for (unsigned int j = 0; j < Dimension; j++)
+		{
+            for(unsigned int k = 0; k < Dimension; k++)
+            {
+                float value = (listOfTensors[i])(j, k) / eigenValues[Dimension-1]; // to normalize the size
+                fprintf(fid, "%f ", value);
+            }
+            if(Dimension == 2)
+            {
+                fprintf(fid, "%f ", 0.0);
+            }
+            fprintf(fid, "\n");
+            
+		}
+        if(Dimension == 2)
+        {
+            fprintf(fid, "0.0 0.0 0.0\n");
+        }
+        
+		fprintf(fid, "\n");
+	}
+	
+	fclose(fid);
+    
+}
+
 
 template<class TInputImageType >
 int GenerateSpatialRiemannianMetricFromOrientedFluxMatrix(int argc, char* argv[])
@@ -77,6 +219,7 @@ int GenerateSpatialRiemannianMetricFromOrientedFluxMatrix(int argc, char* argv[]
     double      scaleSpeedRatio                 = atof(argv[argumentOffset++]);
     bool        generateGlyph                   = (bool)atoi(argv[argumentOffset++]);
     std::string glyphFileName                   = argv[argumentOffset++];
+    double percentVisu                          = atof(argv[argumentOffset++]);
     
     auto OFMatrixImageReader = itk::ImageFileReader<TInputImageType>::New();
     OFMatrixImageReader->SetFileName(inputOFImageFilePath);
@@ -131,7 +274,7 @@ int GenerateSpatialRiemannianMetricFromOrientedFluxMatrix(int argc, char* argv[]
         
         for(unsigned int k = 0; k < Dimension; k++)
         {
-            double sum_lambda_without_k = 0;
+            double sum_lambda_without_k = 0.0;
             for(unsigned int l = 0; l < Dimension; l++)
             {
                 if(l != k)
@@ -142,9 +285,9 @@ int GenerateSpatialRiemannianMetricFromOrientedFluxMatrix(int argc, char* argv[]
             
             for(unsigned int i = 0; i < Dimension; i++)
             {
-                for(unsigned int j = i; j < Dimension; j++)
+                for(unsigned int j = 0; j < Dimension; j++)
                 {
-                    outputMetric(i, j) += exp(-alpha*sum_lambda_without_k)*eigenVectors[i][k]*eigenVectors[j][k];
+                    outputMetric(i, j) += exp(-alpha*sum_lambda_without_k)*eigenVectors[k][i]*eigenVectors[k][j];
                 }
             }
         }
@@ -171,45 +314,8 @@ int GenerateSpatialRiemannianMetricFromOrientedFluxMatrix(int argc, char* argv[]
     
     if(generateGlyph)
     {
-        
+        writeRiemannianMetricToTensorGlyphFile<TInputImageType>(outputMetricImage, glyphFileName, percentVisu);
     }
-        //symmetricEigenAnalysis.ComputeEigenValuesAndVectors(inIt.Get(), eigenValues, eigenVectors );
-        
-        /**********************************************************/
-        /* Testin Code : tests passed successfully */
-        /**********************************************************/
-        /*
-        itkAssertOrThrowMacro(eigenValues[0] <= eigenValues[1], "Eigen values not properly sorted");
-        if(Dimension ==3)
-        {
-            itkAssertOrThrowMacro(eigenValues[1] <= eigenValues[2], "Eigen values not properly sorted");
-        }
-        for(unsigned int i = 0; i < Dimension; i++)
-        {
-            double normEigVector = 0;
-            EigenValuesType EigenVector;
-            for(unsigned int j = 0; j < Dimension; j++)
-            {
-                normEigVector += eigenVectors[i][j]*eigenVectors[i][j];
-                EigenVector[j] = eigenVectors[i][j];
-            }
-            
-            EigenValuesType ProdEigenVector;
-            ProdEigenVector = 0.0 * ProdEigenVector;
-            for(unsigned int j = 0; j < Dimension; j++)
-            {
-                for(unsigned int k = 0; k < Dimension; k++)
-                {
-                    ProdEigenVector[j] += inIt.Get()(j, k)*EigenVector[k];
-                }
-            }
-            ProdEigenVector = ProdEigenVector - eigenValues[i] * EigenVector;
-            double normDiff = ProdEigenVector.GetNorm();
-            itkAssertOrThrowMacro(normDiff < 1e-20, "norm of an eigen vector is not 1");
-            itkAssertOrThrowMacro(fabs(normEigVector - 1) < 1e-6, "norm of an eigen vector is not 1");
-        }
-         */
-    
     return EXIT_SUCCESS;
 }
 
@@ -231,6 +337,7 @@ void Usage(char* argv[])
     << " <scale Speed Ratio (needed only for the scale space case)> " << std::endl
     << " <generate glyph (for visulizing the Riemannian metric)> " << std::endl
     << " <if the previous is true, where to write the file to be visualized with Paraview> " << std::endl
+    << " <percentage of tensors to visualize(sorted by max speed)> " << std::endl
 	<< std::endl << std::endl;
 }
 
@@ -363,3 +470,41 @@ int main ( int argc, char* argv[] )
 	}
 	return EXIT_SUCCESS;
 }
+
+
+//symmetricEigenAnalysis.ComputeEigenValuesAndVectors(inIt.Get(), eigenValues, eigenVectors );
+
+/**********************************************************/
+/* Testin Code : tests passed successfully */
+/**********************************************************/
+/*
+ itkAssertOrThrowMacro(eigenValues[0] <= eigenValues[1], "Eigen values not properly sorted");
+ if(Dimension ==3)
+ {
+ itkAssertOrThrowMacro(eigenValues[1] <= eigenValues[2], "Eigen values not properly sorted");
+ }
+ for(unsigned int i = 0; i < Dimension; i++)
+ {
+ double normEigVector = 0;
+ EigenValuesType EigenVector;
+ for(unsigned int j = 0; j < Dimension; j++)
+ {
+ normEigVector += eigenVectors[i][j]*eigenVectors[i][j];
+ EigenVector[j] = eigenVectors[i][j];
+ }
+ 
+ EigenValuesType ProdEigenVector;
+ ProdEigenVector = 0.0 * ProdEigenVector;
+ for(unsigned int j = 0; j < Dimension; j++)
+ {
+ for(unsigned int k = 0; k < Dimension; k++)
+ {
+ ProdEigenVector[j] += inIt.Get()(j, k)*EigenVector[k];
+ }
+ }
+ ProdEigenVector = ProdEigenVector - eigenValues[i] * EigenVector;
+ double normDiff = ProdEigenVector.GetNorm();
+ itkAssertOrThrowMacro(normDiff < 1e-20, "norm of an eigen vector is not 1");
+ itkAssertOrThrowMacro(fabs(normEigVector - 1) < 1e-6, "norm of an eigen vector is not 1");
+ }
+ */

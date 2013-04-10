@@ -52,7 +52,7 @@ TARGET_LINK_LIBRARIES(GenerateFinslerianMetrics ${Libraries})
 ADD_TEST(tubularity2D-Synthetic-02 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/Synthetic-02.png outputs/Synthetic-02_tubularity.nii 1 outputs/Synthetic-02_scale_space_tubularity.nii 1 outputs/Synthetic-02_OF_Matrix.nii 1 outputs/Synthetic-02_scale_space_OF_Matrix.nii 0 0 4 8 9 0.5 1 1 100000
 )
 
-ADD_TEST(Riemannian-Metric-Space-Synthetic-02 GenerateFinslerianMetrics outputs/Synthetic-02_OF_Matrix.nii data/Synthetic-02_Riemannian_Metric.nii 10 1 0 0)
+ADD_TEST(Riemannian-Metric-Space-Synthetic-02 GenerateFinslerianMetrics outputs/Synthetic-02_OF_Matrix.nii outputs/Synthetic-02_Riemannian_Metric.nii 2 1 1 outputs/Synthetic-02_Tensor_Glyph.vtk 0.05)
 
 
 ####### Real-DSA-01 #######
@@ -63,7 +63,7 @@ ADD_TEST(tubularity2D-Real-DSA-01 itkMultiScaleOrientedFluxBasedMeasureImageFilt
 
 ADD_TEST(tubularity3D-OP_1 itkMultiScaleOrientedFluxBasedMeasureImageFilter data/OP_1.tif outputs/OP_1_tubularity.nii 1 outputs/OP_1_scale_space_tubularity.nii 1 outputs/OP_1_OF_Matrix.nii 1 outputs/OP_1_scale_space_OF_Matrix.nii 0 0 1 6 11 0.5 1 1 100000)
 
-ADD_TEST(tubularity3D-OP_1 GenerateFinslerianMetrics outputs/OP_1_OF_Matrix.nii outputs/OP_1_OF_Riemannian_Metric.nii 10 1 0 0)
+ADD_TEST(Riemannian3D-OP_1 GenerateFinslerianMetrics outputs/OP_1_OF_Matrix.nii outputs/OP_1_OF_Riemannian_Metric.nii 2 1 1 outputs/OP_1_TensorGlyphs.vtk 0.001)
 
 ########################################## testing done ##########################################
 

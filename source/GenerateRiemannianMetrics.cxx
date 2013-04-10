@@ -59,12 +59,14 @@ void GetImageType (std::string							fileName,
 template<class TSymmetricDefinitePositveImageType >
 void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveImageType::Pointer outputMetricImage, std::string glyphFileName, double percent)
 {
+    // TODO TODO TODO
     // first make the list of locations and the associated list of tensors
     // one could first sort all the pixels in outputMetricImage according to:
     //          1/ their anisotropy ratio
     //          2/ their maximal speed (which is the sqrt of the highest eigenvalue)
     //          3/ or just make a random selection
     // once they are sorted(selected), one can select a proportion of the best ones, for instance the 10% highest
+    // TODO TODO TODO
         
     unsigned int const Dimension = TSymmetricDefinitePositveImageType::ImageDimension;
     typedef typename TSymmetricDefinitePositveImageType::PointType      LocationType;
@@ -83,9 +85,9 @@ void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveIm
     EigenAnalysisType symmetricEigenAnalysis(Dimension);
     EigenValuesType  eigenValues;
     
-    
     auto tensorsIt = itk::ImageRegionConstIterator<TSymmetricDefinitePositveImageType> (outputMetricImage, outputMetricImage->GetBufferedRegion());
     
+    // first travers all the tensors, get the max speed along a given direction and sort them accordingly
     std::vector<double> listOfMaxSpeeds; listOfMaxSpeeds.clear();
     tensorsIt.GoToBegin();
     while (!tensorsIt.IsAtEnd())
@@ -94,7 +96,6 @@ void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveIm
         listOfMaxSpeeds.push_back(eigenValues[Dimension-1]);
         ++tensorsIt;
     }
-    std::cout << "start sorting" << std::endl;
     std::sort(listOfMaxSpeeds.begin(), listOfMaxSpeeds.end()) ;
     
     unsigned int idxPercent = floor(listOfMaxSpeeds.size() *(1-percent));
@@ -106,7 +107,6 @@ void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveIm
         TensorType currentTensor = tensorsIt.Get();
         symmetricEigenAnalysis.ComputeEigenValues(currentTensor, eigenValues );
         LocationType pt;
-        
         if(eigenValues[Dimension-1] > threshold_value)
         {
             auto idx = tensorsIt.GetIndex();
@@ -115,11 +115,8 @@ void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveIm
             listOfTensors.push_back(currentTensor);
             listOfScores.push_back(eigenValues[Dimension-1]);
         }
-        
         ++tensorsIt;
     }
-        
-        
         
     // write to a file
     FILE* fid = fopen(glyphFileName.c_str(), "w");
@@ -145,12 +142,7 @@ void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveIm
         }
 		fprintf(fid, "\n");
 	}
-	
-//    fprintf(fid, "\nCELLS 1 9\n");
-//    fprintf(fid, "8 1 2 3 4 5 6 7 0\n\n");//
-//    fprintf(fid, "CELL_TYPES 1\n");
-//    fprintf(fid, "11\n\n");
-    
+	    
     fprintf(fid, "POINT_DATA %d\n", int(listOfLocations.size()));
     fprintf(fid, "SCALARS scalars float\n");
     fprintf(fid, "LOOKUP_TABLE default\n");
@@ -160,13 +152,8 @@ void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveIm
 		fprintf(fid, "%f ", value);
 	}
     fprintf(fid, "\n");
-    
-//	fprintf(fid, "\nPOINT_DATA %d\n", listOfLocations.size());
-	//append another ASCII sub header
-    
-	fprintf(fid, "\nTENSORS %s float\n", "tensors1");
-    
-	//append binary u,v,w data
+        
+	fprintf(fid, "\nTENSORS %s float\n", "RiemannianMetric");
 	for (unsigned int i = 0; i < listOfLocations.size(); i++)
 	{
         
@@ -192,9 +179,7 @@ void writeRiemannianMetricToTensorGlyphFile(typename TSymmetricDefinitePositveIm
         
 		fprintf(fid, "\n");
 	}
-	
 	fclose(fid);
-    
 }
 
 

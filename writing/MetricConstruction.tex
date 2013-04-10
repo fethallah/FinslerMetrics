@@ -1,0 +1,81 @@
+\documentclass[11pt]{amsart}
+\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{epstopdf}
+\usepackage{array}
+\usepackage{booktabs}%
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+\author {F. Benmansour}
+\title{\textit{Constructing metrics from the flux filters}}
+\begin{document}
+\maketitle
+
+\section{Definitions and notations}
+\begin{itemize}
+\item The normalised oriented flux matrix of an image $I$ is defined as follows [Law08] :
+\begin{equation}\label{eq:OF}
+\forall x\in\mathbb{R}^n,\forall r >0, ~~\mathcal{F}(x, r) = (I* \partial_{i, j} g_{\sigma} *\mathds{1}_r)(x)
+\end{equation}
+where, $g_\sigma$ is the Gausian function with standard deviation $\sigma$, and $\mathds{1}_r = 1/ \mathcal{N}(r)$ if $\|x\| < r$ and 0 otherwise, where $\mathcal{N}(r)$ is the flux normalisation term. Typically, for $n = 3$,  $\mathcal{N}(r) = 4\pi r^2$ and for $n = 2$, $\mathcal{N}(r) = 2\pi r$.
+\item The normalised anti-symmetry flux vector is defined as follows [Law10]:
+\begin{equation}\label{eq:AF}
+\forall x\in\mathbb{R}^n,\forall r >0, ~~\mathcal{AS}(x, r) = (I* \partial_{i} g_{\sigma} *\Delta_r)(x)
+\end{equation}
+where $\Delta_r(x) = 1/ \mathcal{N}(r)$ if $\|x\| = r$ and 0 otherwise.
+\end{itemize}
+
+\section{Isotropic Metrics}
+From now on, we assume that we are interested in extracting tubular structures in an image $I$ that are brighter than the background.
+
+At a scale space location $(x, r)$, the matrix $\mathcal{F}(x, r)$. Let $\lambda_1\leq \lambda_2\leq\dots\leq\lambda_n$ be its eigenvalues and $(v_1, v_2, .\dots, v_n)$ be the associated orthonormal basis. We have 
+\begin{equation}\label{eq:diago}
+\mathcal{F}(x, r) = \sum_{i=1}^n \lambda_i v_i v_i^T
+\end{equation}
+
+The cross section trace measure as presented in [Law08] is 
+\begin{equation}\label{eq:CrossSectionTrace}
+\mathcal{CT}(x, r) = \sum_{i=1}^{n-1} \lambda_i 
+\end{equation}
+One can use the scale space version of the cross section trace measure, or a space ply one obtained by maximising it along the scale dimension. That is,
+\begin{equation}\label{eq:CrossSectionTraceSpace}
+\mathcal{CT}(x) = \max_{r} \mathcal{CT}(x, r).
+\end{equation}
+
+Let the associated oriented flux matrix be:
+\begin{equation}\label{eq:OFSpace}
+\mathcal{F}^*(x) = \mathcal{F}(x, r^*),
+\end{equation}
+where $r^* = \displaystyle\text{argmax}_{r} ~\mathcal{CT}(x, r)$.
+
+
+\section{Riemannian Metrics}
+One can construct an anisotropy metric using the previous notations, and as presented in [Benmansour11], 
+\begin{equation}\label{eq:RiemannianMetric1}
+\mathcal{R}(x, r) = \sum_{i=1}^n \exp\left[-\alpha\sum_{j\neq i}\lambda_j\right]v_i v_i^T,
+\end{equation}
+with $\alpha > 0$ is a parameter that is related to the anisotropy ratio as explained later. One can motivate the choice given by equation (\ref{eq:RiemannianMetric1}), by the fact that for a point on the centreline of a tubular structure $v_1$ is an estimate of the direction on which we would like to have a high anisotropy.
+
+The parameter $\alpha$ relates to the anisotropy ratio as follows
+\begin{equation}\label{eq:RiemannianAnisoRatio}
+\kappa(\mathcal{R}(x, r)) =  \exp\left[\frac{\alpha}{2}\left(\sum_{j\neq 1}\lambda_j-\sum_{j\neq n}\lambda_j  \right)\right] = \exp\left[\frac{\alpha}{2}\left(\lambda_n - \lambda_1 \right)\right],
+\end{equation}
+By setting the maximal anisotropy ratio to $\kappa_{\max}$, 
+\begin{equation}\label{eq:alpha}
+\alpha =  \frac{2 \log(\kappa_{\max})}{\max( \lambda_n - \lambda_1)}
+\end{equation}
+
+When operating on the scale space domain, the constructed Riemannian metric is of dimension $(n+1)$, which is an augmentation of $\mathcal{R}(x, r)$ with a \lq\lq scale speed\rq\rq $\mathcal{P}(x, r)$. We want this speed to be always higher than the spatial speed so that our tubular tracked first adapt to scale then it adapts to location.
+Say that the user decides on the ratio of the scale speed compared to the best spatial speed, we call it $\eta$, then one can take
+\begin{equation}\label{eq:alpha}
+\mathcal{P}(x, r)=  \eta\exp\left[-\alpha \sum_{j\neq n} \lambda_i \right].
+\end{equation}
+
+TODO, I still believe that the solution proposed in the IJCV paper is better...but now let's code.
+
+\section{Finslerian Metrics}
+TODO, figure out how to combine the pervious stuff with the anti-symmetry vector.
+\end{document}
